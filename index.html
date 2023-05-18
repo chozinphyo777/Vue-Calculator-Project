@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .errorTextColor{
+        color:red;
+      }
+    </style>
+
+    <!-- Font Awesome -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- MDB -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.3.0/mdb.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body style="background-color: hsla(201, 89%, 57%, 0.298)">
+    <div class="col-md-4 offset-md-4" id="calculator">
+      <div class="card mt-5" style="background-color: rgb(118, 202, 244)">
+        <div class="card-body">
+          <div class="border p-3  rounded text-end">{{ result }}</div>
+          <div class="row py-3">
+            <div class="col-md-6">
+              <input
+                type="number"
+                name=""
+                id=""
+                placeholder="Enter first number"
+                class="form-control"
+                v-model="firstNumber"
+              />
+              <small class="errorTextColor" v-if="validationError.firstNumberStatus">First Number is required</small>
+            </div>
+            <div class="col-md-6">
+              <input
+                type="number"
+                name=""
+                id=""
+                placeholder="Enter second number"
+                class="form-control"
+                v-model="secondNumber"
+              />
+              <small class="errorTextColor"  v-if="validationError.secondNumberStatus">Second Number is required</small>
+            </div>
+
+            <div class="d-flex justify-content-between py-3">
+                <div class="" >
+                    <select class="form-select" aria-label="Default select example" 
+                        v-model="operator">
+                      <option value="">Choose Operator</option>
+                      <option value="+">+</option>
+                      <option value="-">-</option>
+                      <option value="*">*</option>
+                      <option value="/">/</option>
+                    </select>
+                    <small class="errorTextColor"  v-if="validationError.operatorStatus">Operator is required</small>
+                  </div>
+                  <div class="">
+                    <button class="btn btn-primary" @click="calculate()">Calculate</button>
+                  </div>
+                  <div class="">
+                    <button class="btn btn-danger" @click="clearForm()">Clear</button>
+                  </div>
+            </div>
+            <div>
+                <button class="form-control btn btn-warning" @click="save()" :disabled = 'saveDisable'>Save</button>
+            </div>
+          </div>
+          <hr>
+          <div class="">
+            <h6>History</h6>
+           <div v-for="history in histories">
+                <span>{{history}}</span>
+           </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </body>
+  <!-- development version, includes helpful console warnings -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script>
+    let app = new Vue({
+        el : '#calculator',
+        data :{
+          validationError : {
+              firstNumberStatus : false,
+              secondNumberStatus : false,
+              operatorStatus : false,
+            },
+            firstNumber : '',
+            secondNumber : '',
+            operator : '',
+            result : 0,
+            histories : [],
+            saveDisable : true,
+           
+        },
+        methods : {
+            calculate(){
+              this.inputValidation()
+              if(!this.validationError.firstNumberStatus && !this.validationError.secondNumberStatus && !this.validationError.operatorStatus){
+                let answer = this.operation()
+                console.log("Answer" + answer);
+                this.result = `${this.firstNumber} ${this.operator} ${this.secondNumber} = ${answer} `
+                this.clear()
+                this.saveDisable = false
+              }
+             
+            },
+            inputValidation(){
+              console.log(this.firstNumber)
+              this.validationError.firstNumberStatus = this.firstNumber  ? false : true
+              this.validationError.secondNumberStatus = this.secondNumber ? false : true
+               this.validationError.operatorStatus = this.operator ? false : true
+            },
+            clear(){
+                this.firstNumber = ''
+                this.secondNumber = ''
+                this.operator = ''
+               
+            },
+            clearForm(){
+                this.clear()
+                this.result = 0
+                this.histories = []
+                this.validationError.firstNumberStatus = false
+                this.validationError.secondNumberStatus = false
+                this.validationError.operatorStatus = false
+            },
+            operation(){
+                let num1 = parseFloat(this.firstNumber);
+                let num2 = parseFloat(this.secondNumber)
+                console.log("number 1 =>" + num1 + " number 2 =>" + num2);
+                switch (this.operator) {
+                    case '+':
+                        return +(num1 + num2).toFixed(12)
+                        break;
+
+                    case '-':
+                        return num1 - num2
+                        break;
+            
+                    case '*':
+                        return num1 * num2
+                        break;
+            
+                    case '/':
+                        return num1 / num2
+                        break;
+                
+                    default:
+                        break;
+                }
+            },
+            save(){
+                this.histories.push(this.result)
+                this.saveDisable= true
+            }
+        }
+    })
+  </script>
+</html>
